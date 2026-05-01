@@ -6,7 +6,7 @@ import { JWT_Secret } from "../routes/config";
 export const authMiddleware = async(req: any , res: any , next: NextFunction) => {
     const authHeader = req.headers["authorization"];
 
-    if(!authHeader || !.authHeader.startsWith("Bearer ")){
+    if(!authHeader || !authHeader.startsWith("Bearer ")){
         return res.status(403).json({
           msg: `Authorization required`,
         });

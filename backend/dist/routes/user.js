@@ -9,6 +9,8 @@ const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const config_1 = require("./config");
 require("dotenv/config");
+const authmiddleware_1 = require("../middlewwre/authmiddleware");
+const zod_1 = require("./zod");
 const router = (0, express_1.Router)();
 router.post("/signup", async (req, res) => {
     try {
@@ -70,7 +72,25 @@ router.post("/signin", async (req, res) => {
         return res.status(500).json({ msg: `Server error`, e });
     }
 });
-router.post("/signin", (req, res) => {
+router.put("/update", authmiddleware_1.authMiddleware, async (req, res) => {
+    const { success } = zod_1.updateUserInfo.safeParse(req.body);
+    if (!success) {
+        return res.status(400).json({
+            msg: `Error while updating Info`
+        });
+    }
+    try {
+        //@ts-ignore
+        await model_1.Usermodel.updateOne({ _id: req.userId }, req.body);
+        res.status(201).json({
+            msg: `Updated successfuly`,
+        });
+    }
+    catch (e) {
+        return res.status(500).json({
+            msg: `Server Error`
+        });
+    }
 });
 exports.default = router;
 //# sourceMappingURL=user.js.map

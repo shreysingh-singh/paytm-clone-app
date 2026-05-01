@@ -4,6 +4,8 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { JWT_Secret } from "./config";
 import "dotenv/config";
+import { authMiddleware } from "../middlewwre/authmiddleware";
+import { updateUserInfo } from "./zod";
 
 const router = Router();
 
@@ -64,8 +66,26 @@ router.post("/signin", async (req: Request , res: Response) => {
         return res.status(500).json({msg:`Server error`, e});
     }
 });
-router.post("/signin", (req: Request , res: Response) => {
-    
+router.put("/update", authMiddleware, async(req: Request , res: Response) => {
+    const { success } =  updateUserInfo.safeParse(req.body)
+
+    if(!success){
+        return res.status(400).json({
+            msg:`Error while updating Info`
+        });
+    }
+    try {
+      //@ts-ignore
+      await Usermodel.updateOne({ _id: req.userId }, req.body);
+
+      res.status(201).json({
+        msg: `Updated successfuly`,
+      });
+    } catch (e) {
+        return res.status(500).json({
+            msg:`Server Error`
+        });
+    }
 });
 
 
