@@ -21,22 +21,30 @@ router.post("/signup", async (req, res) => {
             });
         }
         const emailCheck = await model_1.Usermodel.findOne({
-            email
+            email,
         });
         if (emailCheck) {
             return res.status(403).json({
-                msg: `Email already exist`
+                msg: `Email already exist`,
             });
         }
         const hashPassword = await bcrypt_1.default.hash(password, 10);
-        await model_1.Usermodel.create({
+        const createdUser = await model_1.Usermodel.create({
             email,
             password: hashPassword,
             firstName,
-            lastName
+            lastName,
         });
+        // Create a new account linked to the created user
+        const createdAccount = await model_1.Accountmodel.create({
+            userId: createdUser._id,
+            balance: Math.floor(1 + Math.random() * 10000),
+        });
+        console.log("Created account:", createdAccount);
         res.status(201).json({
-            msg: `Signin sucessfull`,
+            msg: `Signup successful`,
+            userId: createdUser._id,
+            account: { _id: createdAccount._id, balance: createdAccount.balance },
         });
     }
     catch (e) {
@@ -52,19 +60,22 @@ router.post("/signin", async (req, res) => {
         const existingUser = await model_1.Usermodel.findOne({ email });
         if (!existingUser) {
             return res.status(403).json({
-                msg: `Invalid credentials`
+                msg: `Invalid credentials`,
             });
         }
         const isMatch = await bcrypt_1.default.compare(password, existingUser.password);
         if (!isMatch) {
             return res.status(403).json({
-                msg: `Incorrect Password `
+                msg: `Incorrect Password `,
             });
         }
         else {
-            const token = jsonwebtoken_1.default.sign({ id: existingUser._id.toString() }, config_1.JWT_Secret, { expiresIn: '1h' });
+            const token = jsonwebtoken_1.default.sign({ id: existingUser._id.toString() }, config_1.JWT_Secret, {
+                expiresIn: "1h",
+            });
             return res.status(201).json({
-                msg: `Successful signin`, token
+                msg: `Successful signin`,
+                token,
             });
         }
     }
@@ -76,7 +87,7 @@ router.put("/update", authmiddleware_1.authMiddleware, async (req, res) => {
     const { success } = zod_1.updateUserInfo.safeParse(req.body);
     if (!success) {
         return res.status(400).json({
-            msg: `Error while updating Info`
+            msg: `Error while updating Info`,
         });
     }
     try {
@@ -88,7 +99,7 @@ router.put("/update", authmiddleware_1.authMiddleware, async (req, res) => {
     }
     catch (e) {
         return res.status(500).json({
-            msg: `Server Error`
+            msg: `Server Error`,
         });
     }
 });
@@ -100,13 +111,13 @@ router.get("/bulk", authmiddleware_1.authMiddleware, async (req, res) => {
                 {
                     firstName: {
                         $regex: filter,
-                        $options: "i"
+                        $options: "i",
                     },
                 },
                 {
                     lastName: {
                         $regex: filter,
-                        $options: "i"
+                        $options: "i",
                     },
                 },
             ],
@@ -122,7 +133,7 @@ router.get("/bulk", authmiddleware_1.authMiddleware, async (req, res) => {
     }
     catch (e) {
         return res.status(500).json({
-            msg: `Server Error`
+            msg: `Server Error`,
         });
     }
 });
