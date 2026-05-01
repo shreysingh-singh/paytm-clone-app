@@ -40,11 +40,10 @@ router.post("/signup", async (req, res) => {
             userId: createdUser._id,
             balance: Math.floor(1 + Math.random() * 10000),
         });
-        console.log("Created account:", createdAccount);
         res.status(201).json({
             msg: `Signup successful`,
             userId: createdUser._id,
-            account: { _id: createdAccount._id, balance: createdAccount.balance },
+            account: { _id: createdAccount._id },
         });
     }
     catch (e) {

@@ -14,7 +14,7 @@ const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use((0, cors_1.default)());
 app.use("/api/v1/user", user_1.default);
-app.use("api/v1/account", account_1.default);
+app.use("/api/v1/account", account_1.default);
 const startServer = async () => {
     try {
         if (!config_1.MONGODB_URI) {
