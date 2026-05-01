@@ -92,5 +92,39 @@ router.put("/update", authmiddleware_1.authMiddleware, async (req, res) => {
         });
     }
 });
+router.get("/bulk", authmiddleware_1.authMiddleware, async (req, res) => {
+    const filter = req.body.filter || "";
+    try {
+        const user = await model_1.Usermodel.find({
+            $or: [
+                {
+                    firstName: {
+                        $regex: filter,
+                        $options: "i"
+                    },
+                },
+                {
+                    lastName: {
+                        $regex: filter,
+                        $options: "i"
+                    },
+                },
+            ],
+        });
+        res.status(201).json({
+            user: user.map((user) => ({
+                email: user.email,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                _id: user._id,
+            })),
+        });
+    }
+    catch (e) {
+        return res.status(500).json({
+            msg: `Server Error`
+        });
+    }
+});
 exports.default = router;
 //# sourceMappingURL=user.js.map

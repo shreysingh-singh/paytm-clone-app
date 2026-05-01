@@ -6,6 +6,7 @@ import { JWT_Secret } from "./config";
 import "dotenv/config";
 import { authMiddleware } from "../middlewwre/authmiddleware";
 import { updateUserInfo } from "./zod";
+import { email } from "zod";
 
 const router = Router();
 
@@ -87,6 +88,42 @@ router.put("/update", authMiddleware, async(req: Request , res: Response) => {
         });
     }
 });
+
+router.get("/bulk", authMiddleware , async(req: Request, res: Response) => {
+    const filter = req.body.filter || "";
+
+    try {
+        const user = await Usermodel.find({
+          $or: [
+            {
+              firstName: {
+                $regex: filter,
+                $options: "i"
+              },
+            },
+            {
+              lastName: {
+                $regex: filter,
+                $options: "i"
+              },
+            },
+          ],
+        });
+
+        res.status(201).json({
+          user: user.map((user) => ({
+            email: user.email,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            _id: user._id,
+          })),
+        });
+    } catch (e) {
+        return res.status(500).json({
+            msg:`Server Error`
+        });
+    }
+})
 
 
 export default router

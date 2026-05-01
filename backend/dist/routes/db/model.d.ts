@@ -66,4 +66,55 @@ export declare const Usermodel: mongoose.Model<{
 } & {
     __v: number;
 }>;
+export declare const Accountmodel: mongoose.Model<{
+    userId: mongoose.Types.ObjectId;
+    balance: number;
+}, {}, {}, {
+    id: string;
+}, mongoose.Document<unknown, {}, {
+    userId: mongoose.Types.ObjectId;
+    balance: number;
+}, {
+    id: string;
+}, mongoose.DefaultSchemaOptions> & Omit<{
+    userId: mongoose.Types.ObjectId;
+    balance: number;
+} & {
+    _id: mongoose.Types.ObjectId;
+} & {
+    __v: number;
+}, "id"> & {
+    id: string;
+}, mongoose.Schema<any, mongoose.Model<any, any, any, any, any, any, any>, {}, {}, {}, {}, mongoose.DefaultSchemaOptions, {
+    userId: mongoose.Types.ObjectId;
+    balance: number;
+}, mongoose.Document<unknown, {}, {
+    userId: mongoose.Types.ObjectId;
+    balance: number;
+}, {
+    id: string;
+}, mongoose.DefaultSchemaOptions> & Omit<{
+    userId: mongoose.Types.ObjectId;
+    balance: number;
+} & {
+    _id: mongoose.Types.ObjectId;
+} & {
+    __v: number;
+}, "id"> & {
+    id: string;
+}, unknown, {
+    userId: mongoose.Types.ObjectId;
+    balance: number;
+} & {
+    _id: mongoose.Types.ObjectId;
+} & {
+    __v: number;
+}>, {
+    userId: mongoose.Types.ObjectId;
+    balance: number;
+} & {
+    _id: mongoose.Types.ObjectId;
+} & {
+    __v: number;
+}>;
 //# sourceMappingURL=model.d.ts.map
