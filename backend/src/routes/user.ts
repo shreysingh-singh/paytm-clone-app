@@ -1,5 +1,5 @@
 import { Router , Request , Response } from "express"
-import { Usermodel } from "./db/model";
+import { Accountmodel, Usermodel } from "./db/model";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { JWT_Secret } from "./config";
@@ -32,6 +32,12 @@ router.post("/signup", async(req: Request , res: Response) => {
         password: hashPassword,
         firstName,
         lastName
+     });
+     //Create a new account 
+     await Accountmodel.create({
+        //@ts-ignore
+        userId,
+        balance: 1+Math.random() * 10000
      })
      res.status(201).json({
        msg: `Signin sucessfull`,
