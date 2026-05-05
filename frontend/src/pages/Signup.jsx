@@ -3,8 +3,9 @@ import { Heading } from "../components/Heading";
 import { Inputbox } from "../components/Inputbox";
 import { Button } from "../components/Button";
 import { BottomWarning } from "../components/BottomWarning";
+import axios from "axios";
 
-export default function Signup() {
+export  function Signup() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -107,6 +108,15 @@ export default function Signup() {
 
             <div className="mt-4">
               <Button
+              onClick={() => {
+                axios.post("http://localhost:3000/api/v1/user/signup", {
+                  firstName,
+                  lastName,
+                  email,
+                  password
+                });
+                alert("Singup Successfull");
+              }}
                 type="submit"
                 variant="primary"
                 fullWidth

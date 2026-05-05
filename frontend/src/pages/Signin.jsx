@@ -3,6 +3,7 @@ import { Heading } from "../components/Heading";
 import { Inputbox } from "../components/Inputbox";
 import { Button } from "../components/Button";
 import { BottomWarning } from "../components/BottomWarning";
+import axios from "axios";
 
 export default function Signin() {
   const [email, setEmail] = useState("");
@@ -73,6 +74,13 @@ export default function Signin() {
 
             <div className="mt-4">
               <Button
+              onClick={async() => {
+                const response = await axios.post("http://localhost:3000/api/v1/user/signin", {
+                    email,
+                    password
+                });
+                localStorage.setItem("token", response.data.token)
+              }}
                 type="submit"
                 variant="primary"
                 fullWidth
