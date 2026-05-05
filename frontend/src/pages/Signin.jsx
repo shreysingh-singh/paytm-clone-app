@@ -3,6 +3,7 @@ import { Heading } from "../components/Heading";
 import { Inputbox } from "../components/Inputbox";
 import { Button } from "../components/Button";
 import { BottomWarning } from "../components/BottomWarning";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 export default function Signin() {
@@ -11,6 +12,7 @@ export default function Signin() {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [showWarning, setShowWarning] = useState(true);
+  const navigate = useNavigate();
 
   function validate() {
     const e = {};
@@ -21,21 +23,30 @@ export default function Signin() {
     return e;
   }
 
-  function handleSubmit(evt) {
+  async function handleSubmit(evt) {
     evt.preventDefault();
+
     const eObj = validate();
     setErrors(eObj);
     if (Object.keys(eObj).length > 0) return;
 
     setLoading(true);
-    // simulate signin
-    setTimeout(() => {
+    try {
+      const response = await axios.post("http://localhost:3000/api/v1/user/signin", { email, password });
+      const token = response?.data?.token;
+      if (token) {
+        localStorage.setItem("token", token);
+        // navigate to dashboard
+        navigate("/dashboard");
+      } else {
+        setErrors({ form: "Sign in failed: no token returned" });
+      }
+    } catch (err) {
+      const msg = err?.response?.data?.message || err.message || "Sign in failed";
+      setErrors({ form: msg });
+    } finally {
       setLoading(false);
-      console.log("Signed in", { email });
-      // proceed to dashboard in a real app
-      setEmail("");
-      setPassword("");
-    }, 900);
+    }
   }
 
   return (
@@ -72,20 +83,9 @@ export default function Signin() {
               required
             />
 
+            {errors.form ? <div className="text-sm text-red-600 px-6 mb-2">{errors.form}</div> : null}
             <div className="mt-4">
-              <Button
-              onClick={async() => {
-                const response = await axios.post("http://localhost:3000/api/v1/user/signin", {
-                    email,
-                    password
-                });
-                localStorage.setItem("token", response.data.token)
-              }}
-                type="submit"
-                variant="primary"
-                fullWidth
-                loading={loading}
-              >
+              <Button type="submit" variant="primary" fullWidth loading={loading}>
                 Sign in
               </Button>
             </div>

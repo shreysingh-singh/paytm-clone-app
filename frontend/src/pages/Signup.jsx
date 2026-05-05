@@ -3,6 +3,7 @@ import { Heading } from "../components/Heading";
 import { Inputbox } from "../components/Inputbox";
 import { Button } from "../components/Button";
 import { BottomWarning } from "../components/BottomWarning";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 export  function Signup() {
@@ -13,6 +14,7 @@ export  function Signup() {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [showWarning, setShowWarning] = useState(true);
+  const navigate = useNavigate();
 
   function validate() {
     const e = {};
@@ -114,8 +116,7 @@ export  function Signup() {
                   lastName,
                   email,
                   password
-                });
-                alert("Singup Successfull");
+                }).then(navigate("/signin"));
               }}
                 type="submit"
                 variant="primary"
