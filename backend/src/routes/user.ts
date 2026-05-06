@@ -127,8 +127,9 @@ router.get("/bulk", authMiddleware, async (req: Request, res: Response) => {
       })),
     });
   } catch (e) {
-    const errMsg = e instanceof Error ? e.message : String(e);
-    return res.status(500).json({ msg: `Server Error`, error: errMsg });
+    // log error server-side for debugging
+    console.error("/bulk handler error", e);
+    return res.status(500).json({ msg: `Server Error` });
   }
 });
 
