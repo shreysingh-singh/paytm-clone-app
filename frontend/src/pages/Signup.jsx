@@ -6,7 +6,7 @@ import { BottomWarning } from "../components/BottomWarning";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-export  function Signup() {
+export function Signup() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -29,24 +29,38 @@ export  function Signup() {
     return e;
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     const eObj = validate();
     setErrors(eObj);
     if (Object.keys(eObj).length > 0) return;
 
     setLoading(true);
-    // simulate request
-    setTimeout(() => {
+    setErrors({});
+
+    try {
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/v1/user/signup`, {
+        firstName,
+        lastName,
+        email,
+        password,
+      });
+
       setLoading(false);
-      // Normally you'd call your API here
-      console.log("Registered", { firstName, lastName, email });
       // Clear form
       setFirstName("");
       setLastName("");
       setEmail("");
       setPassword("");
-    }, 1000);
+
+      navigate("/signin");
+    } catch (err) {
+      setLoading(false);
+      setErrors((prev) => ({
+        ...prev,
+        general: err?.response?.data?.message || "Signup failed",
+      }));
+    }
   }
 
   return (
@@ -108,16 +122,12 @@ export  function Signup() {
               required
             />
 
+            {errors.general && (
+              <div className="mt-2 text-sm text-red-600">{errors.general}</div>
+            )}
+
             <div className="mt-4">
               <Button
-              onClick={() => {
-                axios.post("http://localhost:3000/api/v1/user/signup", {
-                  firstName,
-                  lastName,
-                  email,
-                  password
-                }).then(navigate("/signin"));
-              }}
                 type="submit"
                 variant="primary"
                 fullWidth

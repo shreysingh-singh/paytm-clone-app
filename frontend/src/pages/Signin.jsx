@@ -32,7 +32,7 @@ export default function Signin() {
 
     setLoading(true);
     try {
-      const response = await axios.post("http://localhost:3000/api/v1/user/signin", { email, password });
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/v1/user/signin`, { email, password });
       const token = response?.data?.token;
       if (token) {
         localStorage.setItem("token", token);

@@ -3,6 +3,7 @@ import { Button } from "../components/Button";
 import { useSearchParams } from "react-router";
 import axios from "axios";
 
+
 export const SendMoney = () => {
   const [searchParams] = useSearchParams();
   const id = searchParams.get("id");
@@ -23,7 +24,7 @@ export const SendMoney = () => {
     setError("");
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     const num = parseFloat(amount);
     if (!num || num <= 0) {
@@ -37,13 +38,26 @@ export const SendMoney = () => {
 
     setLoading(true);
     setError("");
-    // simulate API
-    setTimeout(() => {
-      setLoading(false);
+
+    try {
+      await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/v1/account/transfer`,
+        { to: id, amount: num, note },
+        {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        }
+      );
+
       setSuccess(true);
       setAmount("");
       setNote("");
-    }, 1000);
+    } catch (err) {
+      setError(err?.response?.data?.message || "Transfer failed");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -144,16 +158,6 @@ export const SendMoney = () => {
 
               <div className="flex items-center gap-3">
                 <Button
-                onClick={() => {
-                  axios.post("http://localhost:3000/api/v1/account/transfer", {
-                    to: id,
-                    amount
-                  }, {
-                    headers: {
-                      Authorization: "Bearer " + localStorage.getItem("token")
-                    }
-                  });
-                }}
                   type="submit"
                   variant="primary"
                   fullWidth={false}
@@ -177,7 +181,7 @@ export const SendMoney = () => {
               {success && (
                 <div className="mt-2 p-3 rounded-md bg-green-50 text-green-800">
                   Transfer completed successfully to{" "}
-                  <span className="font-semibold">{recipient.name}</span>.
+                  <span className="font-semibold">{name}</span>.
                 </div>
               )}
             </form>
