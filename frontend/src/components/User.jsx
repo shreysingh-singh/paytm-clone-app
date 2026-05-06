@@ -31,26 +31,43 @@ export const Users = () => {
       }
 
       try {
+        const params = {};
+        if (filter && filter.trim()) params.filter = filter.trim();
+
         const response = await axios.get(
-          "http://localhost:3000/api/v1/user/bulk?filter=" + filter,
+          `${import.meta.env.VITE_API_URL}/api/v1/user/bulk`,
           {
+            params,
             headers: { Authorization: `Bearer ${token}` },
           },
         );
 
         if (mounted) setUsers(response.data.user || []);
       } catch (err) {
+        // Log full error for debugging
+        console.error("Users fetch error:", err);
+
         if (axios.isAxiosError(err)) {
           const status = err.response?.status;
+          // Handle auth errors explicitly
           if (status === 401 || status === 403) {
             setError("Authorization required. Redirecting to sign in...");
             localStorage.removeItem("token");
             navigate("/signin");
             return;
           }
-          setError(
-            err.response?.data?.msg || err.message || "Failed to load users",
-          );
+
+          const respData = err.response?.data;
+          const message =
+            respData?.message ||
+            respData?.msg ||
+            (typeof respData === "object"
+              ? JSON.stringify(respData)
+              : respData) ||
+            err.message ||
+            "Failed to load users";
+
+          setError(`[${status || "??"}] ${message}`);
         } else {
           setError("Failed to load users");
         }
@@ -143,7 +160,7 @@ function User({ user }) {
           variant="primary"
           size="sm"
           onClick={(e) => {
-            navigate(`/send?id=${user._id}&name=${user.firstName}`)
+            navigate(`/send?id=${user._id}&name=${user.firstName}`);
           }}
         >
           Send
