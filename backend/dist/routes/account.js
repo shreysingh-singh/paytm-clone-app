@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const model_1 = require("./db/model");
-const authmiddleware_1 = require("../middlewwre/authmiddleware");
+const authmiddleware_1 = require("../middleware/authmiddleware");
 const mongoose_1 = __importDefault(require("mongoose"));
 const router = (0, express_1.Router)();
 router.get("/balance", authmiddleware_1.authMiddleware, async (req, res) => {
@@ -16,7 +16,7 @@ router.get("/balance", authmiddleware_1.authMiddleware, async (req, res) => {
         });
         if (!account) {
             return res.status(404).json({
-                msg: `Account not found`
+                msg: `Account not found`,
             });
         }
         res.json({
@@ -25,7 +25,7 @@ router.get("/balance", authmiddleware_1.authMiddleware, async (req, res) => {
     }
     catch (e) {
         return res.status(500).json({
-            msg: `Server Error`
+            msg: `Server Error`,
         });
     }
 });
@@ -69,7 +69,7 @@ router.post("/transfer", authmiddleware_1.authMiddleware, async (req, res) => {
     }
     catch (e) {
         return res.status(500).json({
-            msg: `Server Error`
+            msg: `Server Error`,
         });
     }
     finally {

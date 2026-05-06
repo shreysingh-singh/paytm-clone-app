@@ -9,7 +9,7 @@ const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const config_1 = require("./config");
 require("dotenv/config");
-const authmiddleware_1 = require("../middlewwre/authmiddleware");
+const authmiddleware_1 = require("../middleware/authmiddleware");
 const zod_1 = require("./zod");
 const router = (0, express_1.Router)();
 router.post("/signup", async (req, res) => {
@@ -103,37 +103,30 @@ router.put("/update", authmiddleware_1.authMiddleware, async (req, res) => {
     }
 });
 router.get("/bulk", authmiddleware_1.authMiddleware, async (req, res) => {
-    const filter = req.body.filter || "";
+    // read and sanitize filter from query
+    const raw = typeof req.query?.filter === "string" ? req.query.filter : "";
+    const trimmed = raw.trim().slice(0, 100); // limit length
+    const escapeRegExp = (s) => s.replace(/[.*+?^${}()|[\\]\\]/g, "\\$&");
+    const filter = escapeRegExp(trimmed);
     try {
         const user = await model_1.Usermodel.find({
             $or: [
-                {
-                    firstName: {
-                        $regex: filter,
-                        $options: "i",
-                    },
-                },
-                {
-                    lastName: {
-                        $regex: filter,
-                        $options: "i",
-                    },
-                },
+                { firstName: { $regex: filter, $options: "i" } },
+                { lastName: { $regex: filter, $options: "i" } },
             ],
         });
-        res.status(201).json({
-            user: user.map((user) => ({
-                email: user.email,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                _id: user._id,
+        res.status(200).json({
+            user: user.map((u) => ({
+                email: u.email,
+                firstName: u.firstName,
+                lastName: u.lastName,
+                _id: u._id,
             })),
         });
     }
     catch (e) {
-        return res.status(500).json({
-            msg: `Server Error`,
-        });
+        const errMsg = e instanceof Error ? e.message : String(e);
+        return res.status(500).json({ msg: `Server Error`, error: errMsg });
     }
 });
 exports.default = router;
